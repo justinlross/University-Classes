@@ -1,0 +1,72 @@
+<html>
+    <head>
+		<meta charset="UTF-8">
+		<title>CSC1401 Assignment 1_Days-To-Go</title>
+        <script>
+
+		//Constants Section
+		//Declaring constants to be used in later calculations.
+		//
+
+		const millisecondsPerDay = 1000*60*60*24;
+		const millisecondsPerHour = 1000*60*60;
+		const millisecondsPerMinute = 1000*60;
+		const millisecondsPerSecond = 1000;
+
+
+		//Variables and Objects Section
+		//Declaring variables for later calculations.
+		//
+
+		var eventName = 'TOKYO 2020';
+		var eventYear = 2020;
+		var eventMonth = 6;
+		var eventDay = 24;
+
+		//Variables created to calculate start hour, adjusted to Brisane Time
+		var eventHour = 21;
+		var eventMinute = 00;
+		var eventSecond = 00;
+		var eventMillisecond = 00;
+
+		//Other Statements Section
+		//Calculations and declarations.
+		//
+
+		//Creating the date object
+		var eventDate = new Date(eventYear,eventMonth,eventDay,eventHour,eventMinute,eventSecond,eventMillisecond);
+		var currentDate = new Date();
+
+		//The following code calculates days to the games
+
+		var eventTimeInMilliseconds = eventDate.getTime();
+		var currentTimeInMilliseconds = currentDate.getTime();
+		var timeToEvent = eventTimeInMilliseconds-currentTimeInMilliseconds;
+		var daysToEvent = Math.floor(timeToEvent/millisecondsPerDay);
+
+		var modTimeToEvent = (timeToEvent%millisecondsPerDay);
+
+
+		//Calculates hours after days until the games.
+		var hoursToEvent = Math.floor(modTimeToEvent/millisecondsPerHour);
+
+
+		//Calculate minutes after days and hours have already been calculated.
+		var modHoursToEvent = (modTimeToEvent%millisecondsPerHour);
+		var minsToEvent = Math.floor(modHoursToEvent/millisecondsPerMinute);
+
+
+		//Calculate seconds after days, hours and minutes have already been calculated.
+		var modMinutesToEvent = (modTimeToEvent%millisecondsPerMinute);
+		var secondsToEvent = Math.floor(modMinutesToEvent/millisecondsPerSecond);
+
+
+		//Display the Output string as an alert
+		alert(eventName + ": " + daysToEvent + " DAYS " + hoursToEvent + " HOURS " + minsToEvent + " MINS " + secondsToEvent + " SECS");
+		
+        </script>
+    </head>
+
+    <body>
+    </body>
+</html>
