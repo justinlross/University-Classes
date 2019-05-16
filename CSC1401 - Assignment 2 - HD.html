@@ -1,0 +1,180 @@
+<html>
+    <head>
+		<meta charset="UTF-8">
+		<title>CSC1401 Assignment 2_Days-To-Go</title>
+        <script>
+
+		//Constants Section
+		//Declaring constants to be used in later calculations.
+		//
+
+		const VALIDSTATENAMES = ['new south wales', 'victoria', 'queensland', 'south australia', 'western australia', 'tasmania', 'northern territory', 'australian capital territory'];
+
+		//Variables and Objects Section
+		//Declaring variables to be used in later algorithms. Some variables used in loops may be declared elsewhere.
+		//
+		
+		//Variables for validating the data and calculating growth.
+		var stateName = [];
+		var statePop = [];
+		var statePopChange = [];
+		var userInputState;
+		var userInputPop;
+		var userInputPopChange;
+		var growthDelta = [];
+		var parsedInputPop;
+
+		var gatheringLoopBoolean;
+		var stateNameBoolean;
+		var statePopBoolean;
+		var statePopChangeBoolean;
+		var stateNameCounter;
+		var stateDuplicateBoolean;
+		
+		//Variables for calculating and creating the unordered list.
+		var highGrowthStateIndex;
+		var highGrowthState;
+		var lowGrowthStateIndex;
+		var lowGrowthState;
+
+		//Variables for creating and displaying the table.
+		var statePopCounter;
+		var arrayGrowthIndex;
+		var stateNameOrd = [];
+		var statePopOrd = [];
+		//var statePopChangeOrd = [];
+		var growthDeltaOrd = [];
+
+		var stateNameLoader;
+		var statePopChangeLoader;
+		var growthDeltaChangeLoader;
+		var orderingLoopCounter = 0;
+
+		//Other Statements Section
+		//Calculations and declarations.
+		//
+
+		//Information Gathering Section
+
+		gatheringLoopBoolean = confirm("Do you wish to enter a state?");
+		
+		while (gatheringLoopBoolean) {
+			stateNameBoolean = 1;
+			statePopBoolean = 1;
+			statePopChangeBoolean = 1;
+			while (stateNameBoolean) {
+				stateDuplicateBoolean = 0;
+				userInputState = (prompt('Enter State Name: ').toLowerCase());
+				if (VALIDSTATENAMES.includes(userInputState)) {
+				stateNameCounter = stateName.length;
+				var z=0;
+					while (z < stateNameCounter){
+						if (userInputState.toUpperCase() == stateName[z]){
+								stateDuplicateBoolean = 1;
+								} else {
+								}
+						z++;
+						}
+						if (stateDuplicateBoolean) {
+						stateNameBoolean = 1;
+						alert('Duplicate state name entered, please enter again');
+						} else {
+						stateNameBoolean = 0;
+						}
+					
+				} else {
+				stateNameBoolean = 1;
+				alert('Invalid state name, please enter again');
+				}
+
+			}
+
+
+					while (statePopBoolean) {
+					userInputPop = (prompt('Enter population in 2018: '));
+						if ((userInputPop >= -1000) && (userInputPop <= 10000000) && (!isNaN(userInputPop)) && (!(userInputPop === "" || userInputPop === undefined || userInputPop === null))) {
+						    	parsedInputPop = parseInt(userInputPop);
+							statePopBoolean = 0;
+							} else {
+							alert('Invalid number entered for Population, please try again.');
+							statePopBoolean = 1;
+							}
+					}
+
+							while (statePopChangeBoolean) {
+							userInputPopChange = (prompt('Enter population change over previous year: '));
+
+								if ((userInputPopChange >= -1000) && (userInputPopChange <= 10000000) && (!isNaN(userInputPopChange)) && (!(userInputPopChange === "" || userInputPopChange === undefined || userInputPopChange === null))) {
+										stateName.push(userInputState.toUpperCase());
+										statePop.push(parsedInputPop);
+										statePopChange.push(userInputPopChange);
+										growthDelta.push(userInputPopChange/(parsedInputPop - userInputPopChange));
+										statePopChangeBoolean = 0;
+								} else {
+								alert('Invalid number entered for Population change');
+								statePopChangeBoolean = 1;
+								}
+						}
+
+		gatheringLoopBoolean = confirm("Enter another state?");
+		}	
+		
+
+		highGrowthStateIndex = growthDelta.indexOf(Math.max.apply(null, growthDelta));
+		highGrowthState = stateName[highGrowthStateIndex];
+		lowGrowthStateIndex = growthDelta.indexOf(Math.min.apply(null, growthDelta));
+		lowGrowthState = stateName[lowGrowthStateIndex];
+		
+
+		//Information Presenting Section
+	
+		statePopCounter = statePop.length;
+		while (orderingLoopCounter < statePopCounter) {
+		
+		arrayGrowthIndex = growthDelta.indexOf(Math.max.apply(null, growthDelta))
+		
+		stateNameLoader = stateName[arrayGrowthIndex];
+		statePopLoader = statePop[arrayGrowthIndex];
+		growthDeltaChangeLoader = growthDelta[arrayGrowthIndex];
+		
+		stateName.splice(arrayGrowthIndex,1);
+		statePop.splice(arrayGrowthIndex,1);
+		growthDelta.splice(arrayGrowthIndex,1);
+
+
+		stateNameOrd.push(stateNameLoader);
+		statePopOrd.push(statePopLoader);
+		growthDeltaOrd.push(growthDeltaChangeLoader);
+		
+		orderingLoopCounter++;
+		
+		}
+		
+		document.writeln('<table style="border: 1px solid black;" width="500px;">');
+		document.writeln('<tr>');
+		document.write("<th>State/Territory</th><th>Population</th><th>Growth Rate</th>");
+		document.writeln('</tr>');
+		for (var a=0; a < statePopCounter; a++) {
+			document.writeln('<tr>');
+			document.write('<td style="border: 1px solid black;">' + stateNameOrd[a] + '</td>');
+			document.write('<td style="border: 1px solid black;">' + statePopOrd[a] + '</td>');
+			document.write('<td style="border: 1px solid black;">' + growthDeltaOrd[a] + '</td>');
+			document.writeln('</tr>');
+		}
+		document.writeln('</table>');
+		
+
+
+		//For creating and displaying the unordered list
+		document.writeln('<h1>Statistics</h1>');
+		document.writeln('<ul>');
+		document.writeln('<li>State/territory with highest growth rate:' + highGrowthState + '</li>');
+		document.writeln('<li>State/territory with lowest growth rate:' + lowGrowthState + '</li>');
+		document.writeln('</ul>');
+
+        </script>
+    </head>
+
+    <body>
+    </body>
+</html>
