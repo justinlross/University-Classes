@@ -1,0 +1,637 @@
+<html>
+
+<head>
+
+<title>Shopping Cart System</title>
+
+</head>
+
+<body>
+
+<center>
+<h1>Shopping cart system</h1>
+<div id='add_record'>
+
+<form style="background:#CCC; width:700px">
+
+<p>Condition <input type="radio" name="radioIn" id="inputNewRadioBox" /><label for="inputNewRadioBox">New</label>
+<input type="radio" name="radioIn" id="inputUsedRadioBox" /><label for="inputUsedRadioBox">Used</label></p>
+<p>Items <input type="text" id="inputItem" /> Cost (AUD) <input type="text" id="inputCost" /></p>
+<p>Date <input type="text" id="inputDate" />
+Time <select id="inputTime">
+<option value="08:00am">08:00 am</option>
+<option value="09:00am">09:00 am</option>
+<option value="10:00am">10:00 am</option>
+<option value="11:00am">11:00 am</option>
+<option value="12:00pm">12:00 pm</option>
+<option value="13:00pm">13:00 pm</option>
+<option value="14:00pm">14:00 pm</option>
+<option value="15:00pm">15:00 pm</option>
+<option value="16:00pm">16:00 pm</option>
+<option value="17:00pm">17:00 pm</option>
+<option value="18:00pm">18:00 pm</option>
+</select>
+</p>
+<input type="button" id="addShoppingRecord" value="Add Shopping Record" onclick="addRecord();" />
+
+</form>
+
+</div>
+
+<hr>
+
+<div id='show_record'></div>
+
+<table id ='recordTable' style="border: 1px solid black;">
+<th style="border: 1px solid black;">Condition</th>
+<th style="border: 1px solid black;">Date</th>
+<th style="border: 1px solid black;">Time</th>
+<th style="border: 1px solid black;">Cost</th>
+<th style="border: 1px solid black;">Items</th>
+<tr>
+
+</tr>
+</table>
+
+<p><input type="button" id="sortRecord" value="Sort records" onclick="sortRecords();" /> by 
+<select id='sortSelection'>
+<option value="sortCondition">Condition</option>
+<option value="sortDate">Date</option>
+<option value="sortTime">Time</option>
+<option value="sortCost">Cost</option>
+<option value="sortItems">Items</option>
+</select>
+</p>
+
+<hr>
+
+<table id ='tallyTable' style="border: 1px solid black;" />
+<th style="border: 1px solid black;">Date</th>
+<th style="border: 1px solid black;">No. of Records</th>
+<th style="border: 1px solid black;">Total Cost</th>
+<tr>
+
+</tr>
+</table>
+
+<p><input type="button" id="summaryRecord" value="Summary" onclick="tallyRecords();" /></p>
+
+<hr>
+
+
+<table id ='searchTable' style="border: 1px solid black;">
+<th style="border: 1px solid black;">Condition</th>
+<th style="border: 1px solid black;">Date</th>
+<th style="border: 1px solid black;">Time</th>
+<th style="border: 1px solid black;">Cost</th>
+<th style="border: 1px solid black;">Items</th>
+<tr>
+
+</tr>
+</table>
+
+<p><input type="button" id="searchRecord" value="Search" onclick="searchRecord();" /><input type="text" id="inputSearch" /></p>
+
+<script>
+
+
+//--------------------------------------------------------------------------------
+//Constants
+
+const SECDAY = 86400000;
+
+//--------------------------------------------------------------------------------
+//Global Variables
+
+var shoppingRecordArr = [];
+var recordTableVar;
+var tallyTableVar;
+var searchTableVar;
+var dateGlobalVar;
+var timeGlobalVar;
+
+
+//--------------------------------------------------------------------------------
+//Global Statements
+
+recordTableVar = document.getElementById("recordTable");
+tallyTableVar = document.getElementById("tallyTable");
+searchTableVar = document.getElementById("searchTable");
+
+//--------------------------------------------------------------------------------
+//Functions
+
+/**
+  * @desc The showRecords function displays records in the 'tallyTable' table.
+  * @Input array shoppingRecordArr - This is input, then broken down and displayed in the 'recordTableVar' table in the HTML.
+*/
+
+function showRecords() {
+
+	//Let defines variables that are local to this function.
+	let arrayCounter = shoppingRecordArr.length;
+	let conditionVar;
+	let itemVar;
+	let dateVar;
+	let timeVar;
+	let costVar = 0;
+	let loaderArray = [];
+
+	//Remove previously loaded values in record table.
+	for(var i = recordTableVar.rows.length - 1; i > 0; i--) {
+		recordTableVar.deleteRow(i);
+	}
+
+	//Load values into record table from shoppingRecordArr array.
+	for (var a=0; a < arrayCounter; a++) {
+		loaderArray = shoppingRecordArr[a].split(";",6); //split string via delimiter semi-colon, then load into array.
+		conditionVar = loaderArray[0];
+		dateVar = loaderArray[1];
+		timeVar = loaderArray[2];
+		costVar = loaderArray[3];
+		itemVar = loaderArray[4];
+		let row = recordTableVar.insertRow(-1); //Add row to end of table.
+		row.innerHTML = '<td style="border: 1px solid black;">' + conditionVar +
+		'</td><td style="border: 1px solid black;">' + dateVar +
+		'</td><td style="border: 1px solid black;">' + timeVar +
+		'</td><td style="border: 1px solid black;">' + costVar +
+		'</td><td style="border: 1px solid black;">' + itemVar + '</td>';
+		}
+	}
+
+/**
+  * @desc The addRecord function displays records in the 'tallyTable' table.
+  * @Input html form elements inputNewRadioBox, inputUsedRadioBox, inputItem, inputDate, inputTime, inputCost  - 
+  * @Output array shoppingRecordArr - This array is output by the function after!!!!
+*/
+
+function addRecord() {
+
+	//Let defines variables that are local to this function, calling data from the html form and adding them to variables.
+	let conditionNewVar = document.getElementById('inputNewRadioBox').checked;
+	let conditionUsedVar = document.getElementById('inputUsedRadioBox').checked;
+	let itemVar = document.getElementById('inputItem').value;
+	dateGlobalVar = document.getElementById('inputDate').value;
+	timeGlobalVar = document.getElementById('inputTime').value;
+	let costVar = parseFloat(document.getElementById('inputCost').value).toFixed(2);
+
+	//If appropriate conditions are met, load values into shoppingRecordArr array, delimited by semi colon.
+	if (isValidTime()&&isValidDate()) { //Call the isValidTime and isValidDate functions to verify time and date.
+		if (conditionNewVar) {
+			shoppingRecordArr.push('New; ' + dateGlobalVar + '; ' + timeGlobalVar +
+			'; ' + costVar + '; ' + itemVar);
+			} else if (conditionUsedVar) {
+			shoppingRecordArr.push('Used; ' + dateGlobalVar + '; ' + timeGlobalVar +
+			'; ' + costVar + '; ' + itemVar);
+			} else { alert('Please select either new or used');
+			}
+		}
+	showRecords();
+	}
+
+
+/**
+  * @desc The isValidDate function checks to see if a date input by the html form is correct..
+  * @Input html globally declared variable dateGlobalVar - It runs a test against this previously declared variable.
+  * @Output boolean checkVar - this boolean confirms whether the input by the user passes the test. 1 is a pass, 0 a fail.
+*/
+
+function isValidDate(){
+	let dateArray = new Array();
+	let day;
+	let month;
+	let year;
+	let daysPerMonthArray = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
+	let checkVar = 1;
+
+	//check format
+	if(dateGlobalVar.length != 10 || dateGlobalVar[2] != '/' || dateGlobalVar[5] != '/') {
+        	alert('Not a valid format enter: dd/mm/yyyy');
+		checkVar = 0;
+	} else {
+		dateArray = dateGlobalVar.split("/");
+		day = parseInt(dateArray[0]);
+		month = parseInt(dateArray[1]);
+		year = parseInt(dateArray[2]);
+	}
+			
+	if ((year < 1583) && (checkVar == 1)) {
+		alert('Year must be greater than 1583');
+		checkVar = 0;
+
+	} else if ((year % 400 == 0 || (year % 4 == 0 && year % 100 != 0) && (checkVar == 1))) {
+		daysPerMonthArray[1] = 29;	
+			
+	} else if(month < 1 || month > 12 && (checkVar == 1)) { //check month is valid	
+		alert ('Month must be between 1-12');
+		checkVar = 0;
+			  
+	} else if (day < 1 || day > daysPerMonthArray[month - 1] && (checkVar == 1)) {
+		alert ('day not valid'); 
+		checkVar = 0;
+	}
+			
+	return (checkVar);
+}
+
+
+/**
+  * @desc The isValidTime function checks to see if a time input by the html form is correct..
+  * @Input html globally declared variable timeGlobalVar - It runs a test against this previously declared variable.
+  * @Output boolean value True - this boolean confirms whether the input by the user passes the test. 1 is a pass, 0 a fail.
+*/
+
+function isValidTime() {
+	let inputLength = 0;
+	let hour;
+	let symbol = "";
+	let minute;
+	let amPm = "";
+	let timeBoolean = 1;
+		
+	inputLength = timeGlobalVar.length;
+
+	//slice into individual part
+	hour = parseInt(timeGlobalVar.slice(0,2));
+	symbol = timeGlobalVar.slice(2,3);
+	minute = timeGlobalVar.slice(3,5);
+	amPm = timeGlobalVar.slice(5,7);
+
+	//check input is the correct length	
+	if(inputLength != 7) {
+		alert ('not valid: Enter a time in hours this format only hh:00am/pm eg. 08:00am');
+		timeBoolean = 0;
+	} else {
+		hour = parseInt(timeGlobalVar.slice(0,2));
+		symbol = timeGlobalVar.slice(2,3);
+		minute = timeGlobalVar.slice(3,5);
+		amPm = timeGlobalVar.slice(5,7);
+	}
+	
+	//check time is correct.
+	if(hour < 1 || hour > 19 && (timeBoolean == 1)) {
+		alert('hour not valid hour must be between 1-18');
+		timeBoolean = 0;
+	} else if(symbol != ':') {
+		alert ('not valid: Enter a time in hours this format only hh:00am/pm eg. 08:00am');
+		timeBoolean = 0;
+	} else if(minute != '00' && (timeBoolean == 1)) {
+	  	alert('minues must be entered "00"');
+		timeBoolean = 0;
+	} else if(hour<12 && amPm != 'am' && (timeBoolean == 1)) {
+	  	alert('hours <= 11 must end in "am" all lower case'); 
+		timeBoolean = 0;
+	} else if(hour>11 && amPm != 'pm' && (timeBoolean == 1)) {
+	  	alert('hours > 12 must end in "am" all lower case');
+		timeBoolean = 0;
+	} else {
+	  	return true;
+	}
+}
+
+/**
+  * @desc The sortRecords function uses a sort style input by the user to sort the array based on multiple
+  * @Input html form input from sortSelection, globally declared array shoppingRecordArr - This is the array to be sorted.
+  * @Output array shoppingRecordArr - After sorting the array.
+*/
+
+function sortRecords() {
+
+	//Let defines variables that are local to this function.
+	let arrayCounter = shoppingRecordArr.length;
+	let dropDownVar = document.getElementById("sortSelection").selectedIndex;
+
+	let unsortedArr = [];
+
+	//Variables to store unsorted arrays based on their sort type
+	let conditionArr = [];
+	let dateArr = [];
+	let timeArr = [];
+	let costArr = [];
+	let itemArr = [];
+	let dateTimeObj;
+
+	//Variables for processing the data before storing them in arrays based on type.
+	let temp;
+	let tempTwo;
+	let i;
+	let j;
+	let dateString;
+	let timeString;
+	let dateAmericanizedArr = [];
+	
+	//Splitting shoppingRecordArr into seperate arrays according to their sort type
+	for(var a=0; a < arrayCounter; a++){
+		unsortedArr = shoppingRecordArr[a].split(";", 6);
+		conditionArr.push(unsortedArr[0]);
+		dateAmericanizedArr = unsortedArr[1].split("/", 3);
+		timeString = unsortedArr[2].slice(0, -2);
+		dateString = dateAmericanizedArr[1] + '/' + dateAmericanizedArr[0] +
+		'/' + dateAmericanizedArr[2]  + ', ' + timeString;
+		dateTimeObj = new Date(dateString);
+		dateArr.push(dateTimeObj);
+		timeArr.push(dateTimeObj.getHours());
+		costArr.push(parseInt(unsortedArr[3]));
+		itemArr.push(unsortedArr[4]);
+          }
+	
+	//Sort by condition.
+	if (dropDownVar == 0) {
+            	for(i=0; i < arrayCounter -1; i++){
+              		for(j=0; j < arrayCounter -1; j++){
+                		if (conditionArr[j] > conditionArr[j+1]){
+                  			temp = conditionArr[j];
+		  			tempTwo = shoppingRecordArr[j];
+                  			conditionArr[j] = conditionArr[j+1];
+		  			shoppingRecordArr[j] = shoppingRecordArr[j+1];
+                  			conditionArr[j+1] = temp;
+					shoppingRecordArr[j+1] = tempTwo;
+					}
+				}
+	}
+
+	//Sort by date.
+	} else if (dropDownVar == 1) {
+		for(i=0; i < arrayCounter-1; i++){
+			for(j=0; j < arrayCounter-1; j++){
+				if (dateArr[j] > dateArr[j+1]){
+				temp = dateArr[j];
+				tempTwo = shoppingRecordArr[j];
+				dateArr[j] = dateArr[j+1];
+				shoppingRecordArr[j] = shoppingRecordArr[j+1];
+				dateArr[j+1] = temp;
+				shoppingRecordArr[j+1] = tempTwo;
+				}
+			}
+	}
+
+	//Sort by time.
+	} else if (dropDownVar == 2) {
+		for(i=0; i < arrayCounter-1; i++){
+			for(j=0; j < arrayCounter-1; j++){
+				if (timeArr[j] > timeArr[j+1]){
+				temp = timeArr[j];
+				tempTwo = shoppingRecordArr[j];
+				timeArr[j] = timeArr[j+1];
+				shoppingRecordArr[j] = shoppingRecordArr[j+1];
+				timeArr[j+1] = temp;
+				shoppingRecordArr[j+1] = tempTwo;
+				}
+			}
+	}
+
+	//Sort by cost.
+	} else if (dropDownVar == 3) {
+		for(i=0; i < arrayCounter-1; i++){
+			for(j=0; j < arrayCounter-1; j++){
+				if (costArr[j] < costArr[j+1]){
+				temp = costArr[j];
+				tempTwo = shoppingRecordArr[j];
+				costArr[j] = costArr[j+1];
+				shoppingRecordArr[j] = shoppingRecordArr[j+1];
+				costArr[j+1] = temp;
+				shoppingRecordArr[j+1] = tempTwo;
+				}
+			}
+	}
+
+	//Sort by item name.
+	} else if (dropDownVar == 4) {
+		for(i=0; i < arrayCounter-1; i++){
+			for(j=0; j < arrayCounter-1; j++){
+				if (itemArr[j] > itemArr[j+1]){
+					temp = itemArr[j];
+					tempTwo = shoppingRecordArr[j];
+					itemArr[j] = itemArr[j+1];
+					shoppingRecordArr[j] = shoppingRecordArr[j+1];
+					itemArr[j+1] = temp;
+					shoppingRecordArr[j+1] = tempTwo;
+				}
+			}
+		}
+	}
+
+	showRecords(); // Update the table by calling the show record function.
+
+}
+
+
+/**
+  * @desc The tallyRecords function tallies the number of records and sums the cost for a given date, then displays in table.
+  * @Input globally declared array shoppingRecordArr - this is then broken down and used to tally.
+*/
+
+function tallyRecords() {
+
+	//Variables for calculating the tally results.
+	let shoppingRecordDate;
+	let shoppingRecordDateArr = [];
+	let shoppingRecordCostArr = [];
+	let shoppingRecordTallyArr = [];
+	let tallyDateArr = [];
+	let tallyDateArr2 = [];
+	let tallyDate;
+	let recordDate;
+	let recordDateDay;
+	let recordDateMonth;
+	let recordDateYear;
+	let recordDateInMs;
+	let max = Number.NEGATIVE_INFINITY;
+	let min = Number.POSITIVE_INFINITY;
+	let i;
+	let tallyInputArr = [];
+	let tally = [];
+	let tallySum = [];
+	let slash = '/';
+	let semi = ';';
+
+	//Variables for displaying the tallied results in a table.
+	let arrayCounter = shoppingRecordTallyArr.length;
+	let dateVar;
+	let numberOfRecordsVar;
+	let totalCostVar = 0;
+	let loaderArray = [];
+	let a;
+	 
+	//split dates from shoppingRecordArr
+	for(i=0; i<shoppingRecordArr.length; i++) {
+   		shoppingRecordDate = shoppingRecordArr[i].split(';');
+		shoppingRecordDateArr.push(shoppingRecordDate[1]);
+		shoppingRecordCostArr.push(parseFloat(shoppingRecordDate[3]));
+	}
+	 
+	
+	//further split the dates into day/month/year, change to numbers, create a date valiable from day/month/year
+	//then change date to milliseconds and push to a tallyDateArr
+	for(i=0; i<shoppingRecordDateArr.length; i++) {
+		shoppingRecordDate = shoppingRecordDateArr[i].split('/');
+		recordDateDay = parseInt(shoppingRecordDate[0]);
+		recordDateMonth = parseInt(shoppingRecordDate[1]);
+		recordDateYear = parseInt(shoppingRecordDate[2]);
+		recordDate = new Date(recordDateYear, recordDateMonth, recordDateDay);
+		recordDateInMs =  recordDate.getTime();
+		tallyDateArr.push(recordDateInMs);
+	}
+	 
+	//find min
+	for (i=0; i<tallyDateArr.length; i++) {
+		if(tallyDateArr[i] < min) {
+			min = tallyDateArr[i];
+		}
+	}
+	
+   	//find max
+	for (i=0; i<tallyDateArr.length; i++) {
+		if(tallyDateArr[i] > max) {
+        		max = tallyDateArr[i];
+		}
+	}
+   
+	//make input array for tallying by: (time - min time)/ms in a day therefore indexs will match original
+	for (i=0; i<tallyDateArr.length; i++) {
+		tallyInputArr[i]=(tallyDateArr[i]-min)/SECDAY
+	}
+  
+   
+   	// 1. Initialise tally array elements
+   	for(i=0; i<=((max-min)/SECDAY); i++) {                 
+		tally[i] = 0;
+	}
+    
+   	// 2. Tally occurences
+	for(i=0; i<=tallyInputArr.length; i++) {
+		if((tallyInputArr[i])>=0 && (tallyInputArr[i])<=((max-min)/SECDAY)) {   
+            		tally[tallyInputArr[i]]++;
+		}
+	}
+    
+    
+	//Initialise sum tally
+	for(i=0; i<=((max-min)/SECDAY); i++) {
+		tallySum[i] = 0;   //this creates an array of the correct length
+	}
+	//Tally cost based on date + Sum costs
+	for(i=0; i<=tallyInputArr.length; i++) {
+		tallySum[tallyInputArr[i]] += shoppingRecordCostArr[i]; 
+	}
+		
+		
+		 
+	//Restore date values
+	for(i=0; i<tally.length; i++) {  
+		tallyDateArr[i] = tally.indexOf(tally[i]);
+		tallyDateArr[i] = new Date(min + (tallyDateArr[i]*SECDAY));
+	}
+  
+	 
+	for(i=0; i<tally.length; i++) {
+	 	recordDateDay = tallyDateArr[i].getDate();
+	 	recordDateMonth = tallyDateArr[i].getMonth();
+	 	recordDateYear = tallyDateArr[i].getFullYear();
+	 	tallyDate = (+recordDateDay.toString()+slash+recordDateMonth.toString()+slash+recordDateYear.toString());
+	 	tallyDateArr2.push(tallyDate);
+	}
+	
+
+	//create final array shoppingRecordTallyArr is this format (date,occurances,sum),(date,occurances,sum) etc..
+	for(i=0; i<tally.length; i++) {
+		if (tally[i] > 0) {
+			shoppingRecordTallyArr.push(tallyDateArr2[i]+semi+tally[i]+semi+tallySum[i]);
+		}
+	}
+
+
+	//Let defines variables that are local to this function.
+	arrayCounter = shoppingRecordTallyArr.length;
+
+	//Remove previously loaded values in record table.
+	for(i = tallyTableVar.rows.length - 1; i > 0; i--) {
+		tallyTableVar.deleteRow(i);
+	}
+
+
+	//Load values into record table from shoppingRecordArr array.
+	for (a=0; a < arrayCounter; a++) {
+		loaderArray = shoppingRecordTallyArr[a].split(";",3); //split string via delimiter semi-colon, then load into array.
+		dateVar = loaderArray[0];
+		numberOfRecordsVar = loaderArray[1];
+		totalCostVar = loaderArray[2];
+		row = tallyTableVar.insertRow(-1); //Add row to end of table.
+		row.innerHTML = '<td style="border: 1px solid black;">' + dateVar +
+		'</td><td style="border: 1px solid black;">' + numberOfRecordsVar +
+		'</td><td style="border: 1px solid black;">' + totalCostVar + '</td>';
+	}
+
+
+}
+
+
+
+/**
+  * @desc The sortRecords function checks to see if a time input by the html form is correct.
+  * @Input html globally declared array shoppingRecordArr, html search input 'inputSearch'
+  * if inputSearch string appears in the shoppingRecordArr, add that item from shoppingRecordArr to the search table.
+*/
+
+function searchRecord() {
+
+	//Variables for comparing search input against shoppingRecordArr
+	let aCounter = shoppingRecordArr.length;
+	let searchArrayLoader = [];
+	let stringTest;
+	let searchChecker;
+	let searchInputTest = document.getElementById('inputSearch').value;
+	let z;
+
+	//Variables for displaying the table.
+	let arrayCounter = shoppingRecordArr.length;
+	let conditionVar;
+	let itemVar;
+	let dateVar;
+	let timeVar;
+	let costVar = 0;
+	let loaderArray = [];
+	let row;
+	let y;
+	let x;
+
+
+	//Search every item in the array for what the user input into the search field.
+	for (z=0; z < aCounter; z++) {
+		stringTest = shoppingRecordArr[z];
+		searchChecker = stringTest.includes(searchInputTest);
+		if (searchChecker) {
+			searchArrayLoader.push(shoppingRecordArr[z]);
+		}
+	}
+
+	//Remove previously loaded values in search table.
+	for(y = searchTableVar.rows.length - 1; y > 0; y--) {
+		searchTableVar.deleteRow(y);
+	}
+
+	//Load values into search table from searchArrayLoader array.
+	for (x=0; x < arrayCounter; x++) {
+		loaderArray = searchArrayLoader[x].split(";",6); //split string via delimiter semi-colon, then load into array.
+		conditionVar = loaderArray[0];
+		dateVar = loaderArray[1];
+		timeVar = loaderArray[2];
+		costVar = loaderArray[3];
+		itemVar = loaderArray[4];
+		row = searchTableVar.insertRow(-1); //Add row to end of table.
+		row.innerHTML = '<td style="border: 1px solid black;">' + conditionVar +
+		'</td><td style="border: 1px solid black;">' + dateVar +
+		'</td><td style="border: 1px solid black;">' + timeVar +
+		'</td><td style="border: 1px solid black;">' + costVar +
+		'</td><td style="border: 1px solid black;">' + itemVar + '</td>';
+	}		
+}
+	
+</script>
+
+</center>
+
+</body>
+
+
+</html>
