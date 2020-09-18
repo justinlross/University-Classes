@@ -21,6 +21,8 @@ STA2300 - Data Analysis - Assignment 2 - Grade Achieved: HD (15.60/20)
 
 STA2300 - Data Analysis - Assignment 3 - Grade Achieved: HD (22.50/25)
 
+STA3301 - Statistical Models - Assignment 1 - HD (17.6/20)
+
 STA8190  Advanced Statistics B (Non-Parametric Statistics) - Assignment 1 - Grade Achieved: HD (89.00/100)
 
 STA8190  Advanced Statistics B (Non-Parametric Statistics) - Assignment 2 - Grade Achieved: D (81.00/100)
