@@ -15,6 +15,8 @@ CSC8001 - Intro Data Science Visualization - Assignment 1 - Grade Achieved: HD (
 
 CSC8001 - Intro Data Science Visualization - Data Science Project Report - Grade Achieved: HD (93.00/100)
 
+MAT2100 - Algebra and Calculus II - Assignment 2 - Grade Achieved: HD (94.00/100)
+
 STA2300 - Data Analysis - Assignment 1 - Grade Achieved: HD (5.00/5)
 
 STA2300 - Data Analysis - Assignment 2 - Grade Achieved: HD (15.60/20)
