@@ -21,6 +21,12 @@ CSC8002 - Big Data Management - Assignment 2 - Grade Achieved: HD (25/25)
 
 CSC8002 - Big Data Management - Project - Grade Achieved: HD (50/50)
 
+CSC8003 - Machine Learning - Assignment 1 - Grade Achieved: D (16.7/20)
+
+CSC8003 - Machine Learning - Assignment 2 - Grade Achieved: HD (30/30)
+
+CSC8003 - Machine Learning - Project - Grade Achieved: HD (50/50)
+
 MAT2100 - Algebra and Calculus II - Assignment 2 - Grade Achieved: HD (94.00/100)
 
 STA2300 - Data Analysis - Assignment 1 - Grade Achieved: HD (5.00/5)
